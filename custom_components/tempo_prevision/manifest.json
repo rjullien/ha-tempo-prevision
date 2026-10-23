@@ -1,6 +1,7 @@
 {
   "domain": "tempo_prevision",
   "name": "Tempo Prévision",
+  "after_dependencies": ["recorder"],
   "codeowners": ["@rjullien"],
   "config_flow": true,
   "documentation": "https://github.com/rjullien/tempo-prevision/blob/main/README.md",
