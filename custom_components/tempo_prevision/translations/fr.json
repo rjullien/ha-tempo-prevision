@@ -1,0 +1,39 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Tempo Prévision est déjà configuré"
+    },
+    "step": {
+      "user": {
+        "title": "Tempo Prévision",
+        "description": "Prévisions Tempo Open DPE (J+2..J+7). Aucun identifiant API RTE requis. La précision est optionnelle et peut utiliser les capteurs de couleur hekmon/rtetempo s'ils sont présents.",
+        "data": {
+          "accuracy_enabled": "Activer le capteur de précision des prévisions",
+          "current_color_entity": "Entité couleur réelle (optionnel)",
+          "next_color_entity": "Entité couleur du lendemain (optionnel)"
+        },
+        "data_description": {
+          "current_color_entity": "Par défaut : sensor.rte_tempo_couleur_actuelle si disponible",
+          "next_color_entity": "Par défaut : sensor.rte_tempo_prochaine_couleur si disponible"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Tempo Prévision — Options",
+        "description": "Configurer le capteur de précision optionnel et ses sources de couleur réelle.",
+        "data": {
+          "accuracy_enabled": "Activer le capteur de précision des prévisions",
+          "current_color_entity": "Entité couleur réelle (optionnel)",
+          "next_color_entity": "Entité couleur du lendemain (optionnel)"
+        },
+        "data_description": {
+          "current_color_entity": "Laisser vide pour auto-détecter hekmon/rtetempo",
+          "next_color_entity": "Laisser vide pour auto-détecter hekmon/rtetempo"
+        }
+      }
+    }
+  }
+}
