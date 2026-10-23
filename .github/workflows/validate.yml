@@ -16,3 +16,6 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
+          # Topics require repo settings (cannot be set from this agent).
+          # Brand assets are provided under custom_components/tempo_prevision/brand/.
+          ignore: topics
