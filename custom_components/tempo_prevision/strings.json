@@ -6,15 +6,15 @@
     "step": {
       "user": {
         "title": "Tempo Prévision",
-        "description": "Open DPE Tempo forecasts (J+2..J+7). No RTE API credentials required. Accuracy is optional and can use hekmon/rtetempo color sensors when present.",
+        "description": "Open DPE Tempo forecasts (J+2..J+7). Requires hekmon/rtetempo. No RTE API credentials for this integration. Accuracy defaults to rtetempo color sensors.",
         "data": {
           "accuracy_enabled": "Enable forecast accuracy sensor",
           "current_color_entity": "Actual color entity (optional)",
           "next_color_entity": "Next-day color entity (optional)"
         },
         "data_description": {
-          "current_color_entity": "Defaults to sensor.rte_tempo_couleur_actuelle when available",
-          "next_color_entity": "Defaults to sensor.rte_tempo_prochaine_couleur when available"
+          "current_color_entity": "Leave empty for sensor.rte_tempo_couleur_actuelle",
+          "next_color_entity": "Leave empty for sensor.rte_tempo_prochaine_couleur"
         }
       }
     }
@@ -23,15 +23,15 @@
     "step": {
       "init": {
         "title": "Tempo Prévision — Options",
-        "description": "Configure the optional accuracy sensor and its actual-color sources.",
+        "description": "Configure the optional accuracy sensor and its actual-color sources (defaults: hekmon/rtetempo).",
         "data": {
           "accuracy_enabled": "Enable forecast accuracy sensor",
           "current_color_entity": "Actual color entity (optional)",
           "next_color_entity": "Next-day color entity (optional)"
         },
         "data_description": {
-          "current_color_entity": "Leave empty to auto-detect hekmon/rtetempo",
-          "next_color_entity": "Leave empty to auto-detect hekmon/rtetempo"
+          "current_color_entity": "Leave empty for sensor.rte_tempo_couleur_actuelle",
+          "next_color_entity": "Leave empty for sensor.rte_tempo_prochaine_couleur"
         }
       }
     }

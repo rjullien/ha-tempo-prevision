@@ -1,7 +1,7 @@
 """Accuracy analysis for Tempo forecasts.
 
 Compares forecast predictions to actual colors. Actual-color source entities
-are configurable (default: hekmon/rtetempo sensors when present).
+default to hekmon/rtetempo sensors (hard dependency); optional overrides via options.
 Sundays and French holidays are excluded from calculations.
 """
 from __future__ import annotations
@@ -328,24 +328,13 @@ def resolve_actual_color_entities(
     *,
     configured_current: Optional[str] = None,
     configured_next: Optional[str] = None,
-) -> tuple[Optional[str], Optional[str]]:
+) -> tuple[str, str]:
     """Resolve actual-color source entities.
 
-    Returns (current, next). current is None if unavailable → accuracy skipped.
+    Defaults to hekmon/rtetempo sensors (guaranteed by the rtetempo dependency).
+    Optional config overrides win when set.
     """
-    current = (configured_current or "").strip() or None
-    next_entity = (configured_next or "").strip() or None
-
-    if current is None:
-        state = hass.states.get(DEFAULT_CURRENT_COLOR_ENTITY)
-        if state is not None and state.state not in ("unknown", "unavailable"):
-            current = DEFAULT_CURRENT_COLOR_ENTITY
-        elif hass.states.get(DEFAULT_CURRENT_COLOR_ENTITY) is not None:
-            # Entity exists but may be temporarily unavailable — still use it
-            current = DEFAULT_CURRENT_COLOR_ENTITY
-
-    if next_entity is None:
-        if hass.states.get(DEFAULT_NEXT_COLOR_ENTITY) is not None:
-            next_entity = DEFAULT_NEXT_COLOR_ENTITY
-
+    del hass  # reserved for future discovery; defaults are stable entity_ids
+    current = (configured_current or "").strip() or DEFAULT_CURRENT_COLOR_ENTITY
+    next_entity = (configured_next or "").strip() or DEFAULT_NEXT_COLOR_ENTITY
     return current, next_entity
