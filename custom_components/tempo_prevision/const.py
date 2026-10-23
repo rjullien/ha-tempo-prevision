@@ -8,13 +8,14 @@ OPTION_ACCURACY_ENABLED = "accuracy_enabled"
 OPTION_CURRENT_COLOR_ENTITY = "current_color_entity"
 OPTION_NEXT_COLOR_ENTITY = "next_color_entity"
 
-# Default hekmon/rtetempo entity IDs (auto-detected when present)
+# Default hekmon/rtetempo entity IDs (rtetempo is a hard dependency)
 DEFAULT_CURRENT_COLOR_ENTITY = "sensor.rte_tempo_couleur_actuelle"
 DEFAULT_NEXT_COLOR_ENTITY = "sensor.rte_tempo_prochaine_couleur"
 
-# Suggested object_ids matching rjullien/rtetempo fork entity_ids (migration)
+# Suggested object_ids matching PROD fork entity_ids (migration)
+# Visual sensors use `_visuel` (entity_id); fork unique_ids used `_emoji`.
 SUGGESTED_FORECAST_OBJECT_ID = "rte_tempo_forecast_opendpe_j{day}"
-SUGGESTED_FORECAST_EMOJI_OBJECT_ID = "rte_tempo_forecast_opendpe_j{day}_emoji"
+SUGGESTED_FORECAST_VISUEL_OBJECT_ID = "rte_tempo_forecast_opendpe_j{day}_visuel"
 SUGGESTED_ACCURACY_OBJECT_ID = "rte_tempo_forecast_accuracy"
 
 # Device

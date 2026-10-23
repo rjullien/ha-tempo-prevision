@@ -4,10 +4,11 @@
   "after_dependencies": ["recorder"],
   "codeowners": ["@rjullien"],
   "config_flow": true,
-  "documentation": "https://github.com/rjullien/tempo-prevision/blob/main/README.md",
+  "dependencies": ["rtetempo"],
+  "documentation": "https://github.com/rjullien/ha-tempo-prevision/blob/main/README.md",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/rjullien/tempo-prevision/issues",
+  "issue_tracker": "https://github.com/rjullien/ha-tempo-prevision/issues",
   "requirements": [],
   "version": "0.1.0"
 }

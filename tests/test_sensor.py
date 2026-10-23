@@ -1,10 +1,11 @@
-"""Tests for forecast sensor helpers and accuracy optional path."""
+"""Tests for forecast sensor helpers and accuracy path."""
 from __future__ import annotations
 
 import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.tempo_prevision.const import (
     DOMAIN,
@@ -36,7 +37,7 @@ def test_color_helpers():
 
 
 def test_forecast_sensor_migration_entity_ids():
-    """entity_id matches fork names for migration."""
+    """entity_id matches PROD fork names for migration (_visuel, not _emoji)."""
     from custom_components.tempo_prevision.sensor import OpenDPEForecastSensor
 
     coordinator = MagicMock()
@@ -50,9 +51,10 @@ def test_forecast_sensor_migration_entity_ids():
     assert sensor._attr_unique_id == f"{DOMAIN}_forecast_opendpe_j2"
     assert sensor.entity_id == "sensor.rte_tempo_forecast_opendpe_j2"
 
-    emoji = OpenDPEForecastSensor.__new__(OpenDPEForecastSensor)
-    OpenDPEForecastSensor.__init__(emoji, coordinator, index=1, visual=True)
-    assert emoji.entity_id == "sensor.rte_tempo_forecast_opendpe_j2_emoji"
+    visual = OpenDPEForecastSensor.__new__(OpenDPEForecastSensor)
+    OpenDPEForecastSensor.__init__(visual, coordinator, index=1, visual=True)
+    assert visual._attr_unique_id == f"{DOMAIN}_forecast_opendpe_j2_emoji"
+    assert visual.entity_id == "sensor.rte_tempo_forecast_opendpe_j2_visuel"
 
 
 def _sample_forecasts(n: int = 7) -> list[ForecastDay]:
@@ -68,9 +70,20 @@ def _sample_forecasts(n: int = 7) -> list[ForecastDay]:
 
 
 @pytest.mark.asyncio
-async def test_setup_skips_accuracy_without_source(hass, mock_config_entry):
-    """Accuracy sensor is not created when no actual-color entity exists."""
-    mock_config_entry.add_to_hass(hass)
+async def test_setup_skips_accuracy_when_disabled(hass, mock_config_entry):
+    """Accuracy sensor is not created when disabled in options."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="Tempo Prévision",
+        data={},
+        options={
+            "accuracy_enabled": False,
+            "current_color_entity": "",
+            "next_color_entity": "",
+        },
+        unique_id=DOMAIN,
+    )
+    entry.add_to_hass(hass)
     sample = _sample_forecasts()
 
     with (
@@ -86,28 +99,22 @@ async def test_setup_skips_accuracy_without_source(hass, mock_config_entry):
             "custom_components.tempo_prevision.forecast_coordinator.async_fetch_opendpe_forecast",
             new=AsyncMock(return_value=sample),
         ),
-        patch(
-            "custom_components.tempo_prevision.sensor.resolve_actual_color_entities",
-            return_value=(None, None),
-        ),
     ):
-        assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
+        assert await hass.config_entries.async_setup(entry.entry_id)
         await hass.async_block_till_done()
 
         entity_ids = hass.states.async_entity_ids("sensor")
-        forecast_ids = [e for e in entity_ids if "opendpe" in e]
-        accuracy_ids = [e for e in entity_ids if "accuracy" in e]
         assert "sensor.rte_tempo_forecast_opendpe_j2" in entity_ids
-        assert len(forecast_ids) >= 6
-        assert accuracy_ids == []
+        assert "sensor.rte_tempo_forecast_opendpe_j2_visuel" in entity_ids
+        assert not any("accuracy" in e for e in entity_ids)
 
-        assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
+        assert await hass.config_entries.async_unload(entry.entry_id)
         await hass.async_block_till_done()
 
 
 @pytest.mark.asyncio
-async def test_setup_creates_accuracy_when_source_present(hass, mock_config_entry):
-    """Accuracy sensor is created when actual-color entity resolves."""
+async def test_setup_creates_accuracy_with_rtetempo_defaults(hass, mock_config_entry):
+    """Accuracy sensor is created with default rtetempo color entities."""
     mock_config_entry.add_to_hass(hass)
     sample = _sample_forecasts()
 
@@ -123,10 +130,6 @@ async def test_setup_creates_accuracy_when_source_present(hass, mock_config_entr
         patch(
             "custom_components.tempo_prevision.forecast_coordinator.async_fetch_opendpe_forecast",
             new=AsyncMock(return_value=sample),
-        ),
-        patch(
-            "custom_components.tempo_prevision.sensor.resolve_actual_color_entities",
-            return_value=("sensor.rte_tempo_couleur_actuelle", None),
         ),
         patch(
             "custom_components.tempo_prevision.sensor.AccuracyAnalyzer.analyze",
@@ -144,6 +147,7 @@ async def test_setup_creates_accuracy_when_source_present(hass, mock_config_entr
 
         entity_ids = hass.states.async_entity_ids("sensor")
         assert "sensor.rte_tempo_forecast_accuracy" in entity_ids
+        assert "sensor.rte_tempo_forecast_opendpe_j2_visuel" in entity_ids
 
         assert await hass.config_entries.async_unload(mock_config_entry.entry_id)
         await hass.async_block_till_done()

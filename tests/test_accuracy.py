@@ -1,4 +1,4 @@
-"""Tests for accuracy analysis (decoupled sources)."""
+"""Tests for accuracy analysis (rtetempo-backed defaults)."""
 from __future__ import annotations
 
 import datetime
@@ -73,40 +73,17 @@ def test_calculate_horizon_accuracy(analyzer):
     assert analyzer.calculate_horizon_accuracy(matrix, 2) == pytest.approx(66.7)
 
 
-def test_resolve_actual_color_auto_detect():
-    """Auto-detect hekmon sensors when present."""
+def test_resolve_actual_color_defaults_to_rtetempo():
+    """Without overrides, use hekmon/rtetempo entity IDs."""
     hass = MagicMock()
-    current_state = MagicMock()
-    current_state.state = "Bleu"
-    next_state = MagicMock()
-    next_state.state = "Blanc"
-
-    def get_state(entity_id):
-        if entity_id == DEFAULT_CURRENT_COLOR_ENTITY:
-            return current_state
-        if entity_id == DEFAULT_NEXT_COLOR_ENTITY:
-            return next_state
-        return None
-
-    hass.states.get.side_effect = get_state
     current, nxt = resolve_actual_color_entities(hass)
     assert current == DEFAULT_CURRENT_COLOR_ENTITY
     assert nxt == DEFAULT_NEXT_COLOR_ENTITY
 
 
-def test_resolve_actual_color_missing():
-    """No accuracy source when entities absent."""
-    hass = MagicMock()
-    hass.states.get.return_value = None
-    current, nxt = resolve_actual_color_entities(hass)
-    assert current is None
-    assert nxt is None
-
-
 def test_resolve_actual_color_configured():
-    """Configured entities win over auto-detect."""
+    """Configured entities win over defaults."""
     hass = MagicMock()
-    hass.states.get.return_value = None
     current, nxt = resolve_actual_color_entities(
         hass,
         configured_current="sensor.my_tempo_today",
@@ -123,7 +100,7 @@ async def test_analyze_empty_history():
     analyzer = AccuracyAnalyzer(
         hass,
         current_color_entity="sensor.fake_current",
-        next_color_entity=None,
+        next_color_entity=DEFAULT_NEXT_COLOR_ENTITY,
     )
     analyzer._get_raw_history = AsyncMock(return_value=[])
     hass.states.get.return_value = None

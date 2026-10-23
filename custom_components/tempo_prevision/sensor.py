@@ -34,8 +34,8 @@ from .const import (
     SENSOR_COLOR_WHITE_EMOJI,
     SENSOR_COLOR_WHITE_NAME,
     SUGGESTED_ACCURACY_OBJECT_ID,
-    SUGGESTED_FORECAST_EMOJI_OBJECT_ID,
     SUGGESTED_FORECAST_OBJECT_ID,
+    SUGGESTED_FORECAST_VISUEL_OBJECT_ID,
 )
 from .forecast import ForecastDay
 from .forecast_coordinator import ForecastCoordinator
@@ -103,25 +103,19 @@ async def async_setup_entry(
             configured_current=configured_current,
             configured_next=configured_next,
         )
-        if current:
-            entities.append(
-                TempoAccuracySensor(
-                    hass,
-                    config_entry.entry_id,
-                    current_color_entity=current,
-                    next_color_entity=next_entity,
-                )
+        entities.append(
+            TempoAccuracySensor(
+                hass,
+                config_entry.entry_id,
+                current_color_entity=current,
+                next_color_entity=next_entity,
             )
-            _LOGGER.info(
-                "Accuracy sensor enabled (actual color: %s, next: %s)",
-                current,
-                next_entity,
-            )
-        else:
-            _LOGGER.info(
-                "Accuracy sensor skipped: no actual-color source entity "
-                "(install hekmon/rtetempo or set the option manually)"
-            )
+        )
+        _LOGGER.info(
+            "Accuracy sensor enabled (actual color: %s, next: %s)",
+            current,
+            next_entity,
+        )
 
     async_add_entities(entities, True)
 
@@ -143,10 +137,10 @@ class OpenDPEForecastSensor(CoordinatorEntity[ForecastCoordinator], SensorEntity
 
         if visual:
             self._attr_name = f"OpenDPE J{day} (visuel)"
+            # unique_id keeps `_emoji` suffix (fork convention); entity_id uses `_visuel` (PROD)
             self._attr_unique_id = f"{DOMAIN}_forecast_opendpe_j{day}_emoji"
-            # Force migration-compatible entity_id (HA 2024+ derives object_id from name otherwise)
             self.entity_id = (
-                f"sensor.{SUGGESTED_FORECAST_EMOJI_OBJECT_ID.format(day=day)}"
+                f"sensor.{SUGGESTED_FORECAST_VISUEL_OBJECT_ID.format(day=day)}"
             )
             self._attr_options = [
                 SENSOR_COLOR_BLUE_EMOJI,
@@ -249,7 +243,7 @@ class TempoAccuracySensor(SensorEntity):
         config_id: str,
         *,
         current_color_entity: str,
-        next_color_entity: str | None,
+        next_color_entity: str,
     ) -> None:
         """Initialize the accuracy sensor."""
         self.hass = hass

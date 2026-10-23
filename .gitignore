@@ -19,3 +19,6 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# Test-only stub installed by tests/conftest.py (never ship)
+custom_components/rtetempo/

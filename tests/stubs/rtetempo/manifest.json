@@ -1,0 +1,10 @@
+{
+  "domain": "rtetempo",
+  "name": "RTE Tempo (test stub)",
+  "codeowners": ["@rjullien"],
+  "config_flow": false,
+  "documentation": "https://github.com/hekmon/rtetempo",
+  "iot_class": "cloud_polling",
+  "requirements": [],
+  "version": "0.0.0-teststub"
+}
